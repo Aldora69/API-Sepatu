@@ -1,135 +1,146 @@
-# Shoe Cleaning Service API
+# Shoe Cleaning API
 
-This is a RESTful API for managing a shoe cleaning service. The API allows for tracking shoe cleaning orders, their status, and other relevant information.
+API sederhana untuk layanan **cuci sepatu**, dibangun menggunakan **Node.js**, **Express.js**, dan **Supabase** sebagai backend database.  
+API ini menyediakan endpoint CRUD (Create, Read, Update, Delete) untuk mengelola daftar sepatu yang sedang dicuci.
 
-## Features
+---
 
-- Create new shoe cleaning orders
-- List all orders with optional status filtering
-- Get details of specific orders
-- Update order information and status
-- Delete orders
+## Deskripsi Umum
 
-## Data Structure
+Sistem ini dibuat untuk membantu pengelolaan data sepatu di layanan cuci sepatu.  
+Admin dapat menambah, memperbarui, menghapus, dan melihat status cuci sepatu pelanggan dengan mudah melalui endpoint API.
 
-Each shoe cleaning order contains the following information:
+---
+
+## Tujuan dan Fitur Utama
+
+### Tujuan
+Proyek ini dibuat untuk memenuhi tugas pembuatan REST API sederhana menggunakan Node.js dan Express.js dengan Supabase, dan deployment ke Vercel.
+- Mengimplementasikan konsep CRUD (Create, Read, Update, Delete) dalam REST API.
+- Menyediakan API untuk operasional cuci sepatu.
+- Mempermudah integrasi dengan dashboard admin.
+- Mengelola data sepatu pada database
+
+### Fitur Utama
+- **Menambah data sepatu** (`POST /api/shoes`)
+- **Melihat daftar sepatu** (`GET /api/shoes`)
+- **Memperbarui/mengubah status cuci sepatu** (`PUT /api/shoes/:id`)
+- **Menghapus data sepatu** (`DELETE /api/shoes/:id`)
+- **Filter berdasarkan status** (`GET /api/shoes?status=Selesai`)
+
+---
+
+## Struktur Data
+
+Contoh struktur data sepatu yang disimpan:
 
 ```json
 {
-  "id": "uuid",
-  "customer_name": "string",
-  "shoe_type": "string",
-  "service_type": "string",
-  "status": "string", // ["Pending", "In Progress", "Selesai", "Dibatalkan"]
-  "notes": "string",
-  "created_at": "timestamp",
-  "updated_at": "timestamp"
+  "id": "1",
+  "customerName": "Fufufafa",
+  "shoeType": "Nike Air Force 1",
+  "serviceType": "Cuci",
+  "status": "Sedang Dicuci",
+  "tanggalMasuk": "2025-10-08",
+  "tanggalSelesai": "-"
 }
-```
 
-## API Endpoints
+Keterangan:
 
-### GET /api/shoe-cleaning
-Get all shoe cleaning orders. Can be filtered by status.
+id → Nomor unik sepatu
+customerName → Nama pemilik sepatu
+shoeType → Merek sepatu
+serviceType → Pilihan service sepatu
+status → Status proses
+tanggalMasuk → Tanggal sepatu diterima untuk dicuci
+tanggalSelesai → Tanggal sepatu selesai dicuci
 
-Query Parameters:
-- status (optional): Filter by order status
+---
 
-Example Request:
-```http
-GET /api/shoe-cleaning?status=Selesai
-```
 
-Example Response:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "customer_name": "John Doe",
-      "shoe_type": "Sneakers",
-      "service_type": "Deep Clean",
-      "status": "Selesai",
-      "notes": "White shoes",
-      "created_at": "2025-10-22T10:00:00Z",
-      "updated_at": "2025-10-22T12:00:00Z"
-    }
-  ]
-}
-```
+## Contoh Request & Response Deskripsi Umum
+1. GET Semua Data Sepatu (api/shoe-cleaning)
 
-### POST /api/shoe-cleaning
-Create a new shoe cleaning order.
+Request:
 
-Example Request:
-```http
-POST /api/shoe-cleaning
+[
+  {
+    "customerName": "Fufufafa",
+    "shoeType": "Nike Air Jordan",
+    "serviceType": "Cuci",
+    "status": "In Progress",
+    "notes": "-"
+  }
+]
+
+GET /api/shoes
+
+
+Response:
+
+[
+  {
+    "id": 1,
+    "customer_name": "Budi Santoso",
+    "shoe_type": "Sneakers",
+    "status": "Proses",
+    "created_at": "2025-10-21T10:00:00Z"
+  }
+]
+
+2. POST Tambah Data Sepatu
+
+Request:
+
+POST /api/shoes
 Content-Type: application/json
 
 {
-  "customerName": "John Doe",
-  "shoeType": "Sneakers",
-  "serviceType": "Deep Clean",
-  "notes": "White shoes"
+  "customer_name": "Andi Wijaya",
+  "shoe_type": "Vans Old Skool",
+  "status": "Proses"
 }
-```
 
-### GET /api/shoe-cleaning/:id
-Get a specific order by ID.
 
-### PUT /api/shoe-cleaning/:id
-Update an existing order.
+Response:
 
-Example Request:
-```http
-PUT /api/shoe-cleaning/123e4567-e89b-12d3-a456-426614174000
+{
+  "message": "Data sepatu berhasil ditambahkan",
+  "data": {
+    "id": 2,
+    "customer_name": "Andi Wijaya",
+    "shoe_type": "Vans Old Skool",
+    "status": "Proses"
+  }
+}
+
+3. PUT Update Status Sepatu
+
+Request:
+
+PUT /api/shoes/2
 Content-Type: application/json
 
 {
   "status": "Selesai"
 }
-```
 
-### DELETE /api/shoe-cleaning/:id
-Delete an order.
 
-## Installation and Setup
+Response:
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file with the following variables:
-   ```
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_KEY=your_supabase_key
-   PORT=3000
-   ```
-4. Create a table in your Supabase database:
-   ```sql
-   create table shoe_cleaning (
-     id uuid default uuid_generate_v4() primary key,
-     customer_name text not null,
-     shoe_type text not null,
-     service_type text not null,
-     status text not null default 'Pending',
-     notes text,
-     created_at timestamp with time zone default timezone('utc'::text, now()),
-     updated_at timestamp with time zone
-   );
-   ```
-5. Run the development server:
-   ```bash
-   npm run dev
-   ```
+{
+  "message": "Status sepatu berhasil diperbarui"
+}
 
-## Deployment
+4. DELETE Hapus Data
 
-This API is deployed on Vercel. To deploy your own instance:
+Request:
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add your environment variables in Vercel's project settings
-4. Deploy!
+DELETE /api/shoes/2
+
+
+Response:
+
+{
+  "message": "Data sepatu berhasil dihapus"
+}
